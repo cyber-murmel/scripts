@@ -1,0 +1,36 @@
+#! /usr/bin/env bash
+
+########
+# this is a script to flip the screen and the touchinputs
+# use this e.g. for the Lenovo x220T
+# you also might want to have a onscreen keyboard at hand
+# I use kvkbd
+# add two (three) lines in the rc.lua
+#	globalkeys = awful.util.table.join(
+#	    -- My Bindings
+#	    awful.key({ }, "XF86TaskPane", function () awful.util.spawn("kvkbd") end),
+#	    awful.key({ }, "XF86RotateWindows", function () awful.util.spawn("flipscreen") end),
+#	    ...
+########
+
+screen="LVDS1"
+
+descr=$(xrandr | grep "$screen")
+if echo "$descr" | grep disconnected
+then
+        echo "No $screen connected"
+        exit 1
+fi
+
+alt="inverted"
+if echo "$descr" | grep --quiet -P "^[^(]*$alt"
+then
+        rotate="normal"
+	xinput set-prop "Wacom ISDv4 E6 Pen" "Evdev Axis Inversion" 0 0
+	xinput set-prop "Wacom ISDv4 E6 Finger" "Coordinate Transformation Matrix" 1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000
+else
+        rotate="$alt"
+	xinput set-prop "Wacom ISDv4 E6 Pen" "Evdev Axis Inversion" 1 1
+	xinput set-prop "Wacom ISDv4 E6 Finger" "Coordinate Transformation Matrix" -1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 1.000000, 0.000000, 0.000000, 1.000000
+fi
+xrandr --output $screen --rotate $rotate 
