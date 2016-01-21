@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+sudo killall wpa_supplicant
+sudo ip link set wlp3s0 up
+sudo wpa_supplicant -B -i wlp3s0 -c /etc/wpa_supplicant/main.conf
+sudo dhcpcd
